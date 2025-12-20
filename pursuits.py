@@ -22,8 +22,7 @@ pygame.display.set_caption("Eye Pursuit")
 clock = pygame.time.Clock()
 
 # --- Control State ---
-circle_radius = 40  # Object size
-circle_orbit_radius = 200  # New: movement/orbit radius for 'Circle' pattern
+circle_radius = 40
 circle_speed = 150
 pattern_idx = 0
 
@@ -59,14 +58,12 @@ def draw_dropdown(x, y, w, h, options, selected_idx, open_):
 def get_position(t, pattern, speed, radius):
     cx, cy = WIDTH // 2, HEIGHT // 2
     # Calculate max movement radii so the circle stays inside the screen
-    max_rx = cx - radius - 10
-    max_ry = cy - radius - 10
-    # For 'Circle' pattern, use the user-controlled orbit radius, but clamp to fit screen
-    orbit_r = min(circle_orbit_radius, max_ry, max_rx)
+    max_rx = cx - circle_radius - 10
+    max_ry = cy - circle_radius - 10
     if pattern == "Circle":
         angle = (speed/100) * t
-        x = cx + orbit_r * math.cos(angle)
-        y = cy + orbit_r * math.sin(angle)
+        x = cx + max_ry * math.cos(angle) # Using max_ry to keep circle within vertical bounds
+        y = cy + max_ry * math.sin(angle)
     elif pattern == "Horizontal":
         x = cx + (max_rx) * math.sin((speed/100)*t)
         y = cy
@@ -103,9 +100,6 @@ while running:
             # Size slider
             if 50 <= mx <= 350 and 500 <= my <= 530:
                 slider_drag = 'size'
-            # Orbit radius slider (new)
-            elif 50 <= mx <= 350 and 540 <= my <= 570:
-                slider_drag = 'orbit_radius'
             # Speed slider
             elif 400 <= mx <= 700 and 500 <= my <= 530:
                 slider_drag = 'speed'
@@ -126,9 +120,6 @@ while running:
             if slider_drag == 'size':
                 # Map mouse x to size
                 circle_radius = max(10, min(100, (mx-50)/3))
-            elif slider_drag == 'orbit_radius':
-                # Map mouse x to orbit radius
-                circle_orbit_radius = max(20, min(350, (mx-50)/2))
             elif slider_drag == 'speed':
                 circle_speed = max(20, min(400, (mx-400)*1.2))
 
@@ -142,8 +133,6 @@ while running:
     # Draw control panel
     # Size slider
     draw_slider(50, 500, 300, 30, 2, 50, circle_radius, "Size")
-    # Orbit radius slider (new)
-    draw_slider(50, 540, 300, 30, 20, 350, circle_orbit_radius, "Movement Radius")
     # Speed slider
     draw_slider(400, 500, 300, 30, 20, 400, circle_speed, "Speed")
     # Dropdown
