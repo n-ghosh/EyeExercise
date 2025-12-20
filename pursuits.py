@@ -1,3 +1,14 @@
+"""
+Eye Pursuit Game (Part of Eye Exercise Series)
+
+A simple interactive game for visual tracking practice. The user controls:
+- Object size (slider)
+- Movement speed (slider)
+- Movement pattern (dropdown: circle, horizontal, vertical, diagonal, figure-eight)
+
+The object moves smoothly along the selected path. Designed for visual/oculomotor training.
+"""
+
 import pygame
 import math
 
