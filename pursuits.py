@@ -111,7 +111,7 @@ def get_position(t, pattern, speed, radius):
     
     if pattern == "Circle":
         angle = (speed/100) * t
-        x = cx + max_ry * math.cos(angle)
+        x = cx + max_ry * math.cos(angle) # Using max_ry to keep circle within vertical bounds
         y = cy + max_ry * math.sin(angle)
     elif pattern == "Horizontal":
         x = cx + (max_rx) * math.sin((speed/100)*t)
