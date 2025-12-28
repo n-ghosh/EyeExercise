@@ -144,7 +144,7 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = event.pos
-            # Toggle button (now in top-left corner, wider for label)
+            # Toggle button (in top-left corner)
             if sidebar_open:
                 if 0 <= mx <= 120 and 0 <= my <= 40:
                     sidebar_open = False
