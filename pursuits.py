@@ -15,14 +15,17 @@ import math
 # --- Config ---
 WIDTH, HEIGHT = 1400, 800
 FPS = 120
+SIDEBAR_WIDTH = 280
 
 # --- Colors ---
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (180, 180, 180)
 LIGHT_GRAY = (220, 220, 220)
+DARK_GRAY = (100, 100, 100)
 BLUE = (100, 180, 255)
 RED = (255, 100, 100)
+SIDEBAR_BG = (245, 245, 245)
 
 # --- Movement Patterns ---
 PATTERNS = ["Circle", "Horizontal", "Vertical", "Diagonal", "Figure-Eight"]
@@ -36,6 +39,7 @@ clock = pygame.time.Clock()
 circle_radius = 40
 circle_speed = 150
 pattern_idx = 0
+sidebar_open = True
 
 # --- Slider/Dropdown UI ---
 def draw_slider(x, y, w, h, min_val, max_val, value, label):
@@ -48,7 +52,7 @@ def draw_slider(x, y, w, h, min_val, max_val, value, label):
     # Label
     font = pygame.font.SysFont(None, 24)
     text = font.render(f"{label}: {value:.0f}", True, BLACK)
-    screen.blit(text, (x, y-h//2-5))
+    screen.blit(text, (x, y-30))
     return pos
 
 def draw_dropdown(x, y, w, h, options, selected_idx, open_):
@@ -65,12 +69,44 @@ def draw_dropdown(x, y, w, h, options, selected_idx, open_):
             screen.blit(t, (x+10, y+(i+1)*h+5))
     return
 
+def draw_toggle_button(x, y, w, h, is_open):
+    pygame.draw.rect(screen, DARK_GRAY, (x, y, w, h), border_radius=8)
+    font_icon = pygame.font.SysFont(None, 28)
+    font_label = pygame.font.SysFont(None, 22, bold=True)
+    # Icon
+    icon = font_icon.render("◀" if is_open else "▶", True, WHITE)
+    icon_rect = icon.get_rect(left=x+8, centery=y+h//2)
+    screen.blit(icon, icon_rect)
+    # Label
+    label = font_label.render("Settings", True, WHITE)
+    label_rect = label.get_rect(left=icon_rect.right+6, centery=y+h//2)
+    screen.blit(label, label_rect)
+
+def draw_sidebar():
+    # Sidebar background
+    pygame.draw.rect(screen, SIDEBAR_BG, (0, 0, SIDEBAR_WIDTH, HEIGHT))
+    pygame.draw.line(screen, GRAY, (SIDEBAR_WIDTH, 0), (SIDEBAR_WIDTH, HEIGHT), 2)
+    # Size slider
+    draw_slider(20, 120, 240, 30, 10, 100, circle_radius, "Size")
+    # Speed slider
+    draw_slider(20, 220, 240, 30, 20, 400, circle_speed, "Speed")
+    # Pattern dropdown
+    font = pygame.font.SysFont(None, 22)
+    screen.blit(font.render("Pattern", True, BLACK), (20, 300))
+    draw_dropdown(20, 330, 240, 30, PATTERNS, pattern_idx, dropdown_open)
+
 # --- Movement Functions ---
 def get_position(t, pattern, speed, radius):
-    cx, cy = WIDTH // 2, HEIGHT // 2
+    # Calculate center based on whether sidebar is open
+    offset = SIDEBAR_WIDTH if sidebar_open else 0
+    available_width = WIDTH - offset
+    cx = offset + available_width // 2
+    cy = HEIGHT // 2
+    
     # Calculate max movement radii so the circle stays inside the screen
-    max_rx = cx - circle_radius - 10
-    max_ry = cy - circle_radius - 10
+    max_rx = available_width // 2 - circle_radius - 20
+    max_ry = cy - circle_radius - 20
+    
     if pattern == "Circle":
         angle = (speed/100) * t
         x = cx + max_ry * math.cos(angle) # Using max_ry to keep circle within vertical bounds
@@ -87,7 +123,7 @@ def get_position(t, pattern, speed, radius):
         y = cy + diag_r * math.sin((speed/100)*t)
     elif pattern == "Figure-Eight":
         angle = (speed/100) * t
-        x = cx + max_rx * math.sin(angle) # check the math on this
+        x = cx + max_rx * math.sin(angle)
         y = cy + max_ry * math.sin(angle) * math.cos(angle)
     else:
         x, y = cx, cy
@@ -108,31 +144,47 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = event.pos
-            # Size slider
-            if 50 <= mx <= 350 and 500 <= my <= 530:
-                slider_drag = 'size'
-            # Speed slider
-            elif 400 <= mx <= 700 and 500 <= my <= 530:
-                slider_drag = 'speed'
-            # Dropdown
-            elif 750 <= mx <= 900 and 500 <= my <= 530:
-                dropdown_open = not dropdown_open
-            elif dropdown_open and 750 <= mx <= 900 and 530 < my <= 530+len(PATTERNS)*30:
-                idx = (my-530)//30
-                if 0 <= idx < len(PATTERNS):
-                    pattern_idx = idx
-                dropdown_open = False
+            # Toggle button (in top-left corner)
+            if sidebar_open:
+                if 0 <= mx <= 120 and 0 <= my <= 40:
+                    sidebar_open = False
+                    dropdown_open = False
+                    continue
+            else:
+                if 0 <= mx <= 120 and 0 <= my <= 40:
+                    sidebar_open = True
+                    dropdown_open = False
+                    continue
+            # Only handle sidebar controls if sidebar is open
+            if sidebar_open:
+                # Size slider
+                if 20 <= mx <= 260 and 120 <= my <= 150:
+                    slider_drag = 'size'
+                # Speed slider
+                elif 20 <= mx <= 260 and 220 <= my <= 250:
+                    slider_drag = 'speed'
+                # Dropdown
+                elif 20 <= mx <= 260 and 330 <= my <= 360:
+                    dropdown_open = not dropdown_open
+                elif dropdown_open and 20 <= mx <= 260 and 360 < my <= 360+len(PATTERNS)*30:
+                    idx = (my-360)//30
+                    if 0 <= idx < len(PATTERNS):
+                        pattern_idx = idx
+                    dropdown_open = False
+                else:
+                    dropdown_open = False
             else:
                 dropdown_open = False
+                
         elif event.type == pygame.MOUSEBUTTONUP:
             slider_drag = None
-        elif event.type == pygame.MOUSEMOTION and slider_drag:
+        elif event.type == pygame.MOUSEMOTION and slider_drag and sidebar_open:
             mx, my = event.pos
             if slider_drag == 'size':
                 # Map mouse x to size
-                circle_radius = max(10, min(100, (mx-50)/3))
+                circle_radius = max(10, min(100, (mx-20)*0.375))
             elif slider_drag == 'speed':
-                circle_speed = max(20, min(400, (mx-400)*1.2))
+                circle_speed = max(20, min(400, (mx-20)*1.583))
 
     # Draw background
     screen.fill(WHITE)
@@ -141,15 +193,14 @@ while running:
     x, y = get_position(t, PATTERNS[pattern_idx], circle_speed, circle_radius)
     pygame.draw.circle(screen, BLUE, (x, y), int(circle_radius))
 
-    # Draw control panel
-    # Size slider
-    draw_slider(50, 500, 300, 30, 2, 50, circle_radius, "Size")
-    # Speed slider
-    draw_slider(400, 500, 300, 30, 20, 400, circle_speed, "Speed")
-    # Dropdown
-    draw_dropdown(750, 500, 150, 30, PATTERNS, pattern_idx, dropdown_open)
-    font = pygame.font.SysFont(None, 22)
-    screen.blit(font.render("Pattern", True, BLACK), (750, 480))
+    # Draw sidebar if open
+    if sidebar_open:
+        draw_sidebar()
+    # Draw toggle button in top-left corner, with 'Settings' inside
+    if sidebar_open:
+        draw_toggle_button(0, 0, 120, 40, True)
+    else:
+        draw_toggle_button(0, 0, 120, 40, False)
 
     pygame.display.flip()
     dt = clock.tick(60) / 1000
