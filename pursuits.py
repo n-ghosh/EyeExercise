@@ -71,27 +71,25 @@ def draw_dropdown(x, y, w, h, options, selected_idx, open_):
 
 def draw_toggle_button(x, y, w, h, is_open):
     pygame.draw.rect(screen, DARK_GRAY, (x, y, w, h), border_radius=8)
-    font = pygame.font.SysFont(None, 28)
-    text = font.render("◀" if is_open else "▶", True, WHITE)
-    text_rect = text.get_rect(center=(x+w//2, y+h//2))
-    screen.blit(text, text_rect)
+    font_icon = pygame.font.SysFont(None, 28)
+    font_label = pygame.font.SysFont(None, 22, bold=True)
+    # Icon
+    icon = font_icon.render("◀" if is_open else "▶", True, WHITE)
+    icon_rect = icon.get_rect(left=x+8, centery=y+h//2)
+    screen.blit(icon, icon_rect)
+    # Label
+    label = font_label.render("Settings", True, WHITE)
+    label_rect = label.get_rect(left=icon_rect.right+6, centery=y+h//2)
+    screen.blit(label, label_rect)
 
 def draw_sidebar():
     # Sidebar background
     pygame.draw.rect(screen, SIDEBAR_BG, (0, 0, SIDEBAR_WIDTH, HEIGHT))
     pygame.draw.line(screen, GRAY, (SIDEBAR_WIDTH, 0), (SIDEBAR_WIDTH, HEIGHT), 2)
-    
-    # Title
-    font_title = pygame.font.SysFont(None, 32, bold=True)
-    title = font_title.render("Settings", True, BLACK)
-    screen.blit(title, (20, 30))
-    
     # Size slider
     draw_slider(20, 120, 240, 30, 10, 100, circle_radius, "Size")
-    
     # Speed slider
     draw_slider(20, 220, 240, 30, 20, 400, circle_speed, "Speed")
-    
     # Pattern dropdown
     font = pygame.font.SysFont(None, 22)
     screen.blit(font.render("Pattern", True, BLACK), (20, 300))
@@ -146,15 +144,19 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = event.pos
-            
-            # Toggle button (always visible)
-            toggle_x = SIDEBAR_WIDTH if sidebar_open else 0
-            if toggle_x <= mx <= toggle_x + 40 and HEIGHT//2 - 40 <= my <= HEIGHT//2 + 40:
-                sidebar_open = not sidebar_open
-                dropdown_open = False
-            
+            # Toggle button (now in top-left corner, wider for label)
+            if sidebar_open:
+                if 0 <= mx <= 120 and 0 <= my <= 40:
+                    sidebar_open = False
+                    dropdown_open = False
+                    continue
+            else:
+                if 0 <= mx <= 120 and 0 <= my <= 40:
+                    sidebar_open = True
+                    dropdown_open = False
+                    continue
             # Only handle sidebar controls if sidebar is open
-            elif sidebar_open:
+            if sidebar_open:
                 # Size slider
                 if 20 <= mx <= 260 and 120 <= my <= 150:
                     slider_drag = 'size'
@@ -194,10 +196,11 @@ while running:
     # Draw sidebar if open
     if sidebar_open:
         draw_sidebar()
-    
-    # Draw toggle button
-    toggle_x = SIDEBAR_WIDTH if sidebar_open else 0
-    draw_toggle_button(toggle_x, HEIGHT//2 - 40, 40, 80, sidebar_open)
+    # Draw toggle button in top-left corner, with 'Settings' inside
+    if sidebar_open:
+        draw_toggle_button(0, 0, 120, 40, True)
+    else:
+        draw_toggle_button(0, 0, 120, 40, False)
 
     pygame.display.flip()
     dt = clock.tick(60) / 1000
