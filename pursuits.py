@@ -14,7 +14,7 @@ import math
 
 # --- Config ---
 WIDTH, HEIGHT = 1400, 800
-FPS = 120
+FPS = 600
 SIDEBAR_WIDTH = 280
 
 # --- Colors ---
@@ -28,8 +28,16 @@ RED = (255, 100, 100)
 SIDEBAR_BG = (245, 245, 245)
 
 # --- Movement Patterns ---
-PATTERNS = ["Circle", "Horizontal", "Vertical", "Diagonal", "Figure-Eight"]
-
+PATTERNS = [
+    "Circle",
+    "Circle CCW",
+    "Horizontal",
+    "Vertical",
+    "Diagonal",
+    "Diagonal 2",
+    "Figure-Eight",
+    "Figure-Eight 2",
+]
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Eye Pursuit")
@@ -111,6 +119,10 @@ def get_position(t, pattern, speed, radius):
         angle = (speed/100) * t
         x = cx + max_ry * math.cos(angle) # Using max_ry to keep circle within vertical bounds
         y = cy + max_ry * math.sin(angle)
+    elif pattern == "Circle CCW":
+        angle = -(speed / 100) * t
+        x = cx + max_ry * math.cos(angle)
+        y = cy + max_ry * math.sin(angle)
     elif pattern == "Horizontal":
         x = cx + (max_rx) * math.sin((speed/100)*t)
         y = cy
@@ -121,8 +133,16 @@ def get_position(t, pattern, speed, radius):
         diag_r = min(max_rx, max_ry)
         x = cx + diag_r * math.sin((speed/100)*t)
         y = cy + diag_r * math.sin((speed/100)*t)
+    elif pattern == "Diagonal 2":
+        diag_r = min(max_rx, max_ry)
+        x = cx + diag_r * math.sin((speed / 100) * t)
+        y = cy - diag_r * math.sin((speed / 100) * t)
     elif pattern == "Figure-Eight":
         angle = (speed/100) * t
+        x = cx + max_rx * math.sin(angle)
+        y = cy + max_ry * math.sin(angle) * math.cos(angle)
+    elif pattern == "Figure-Eight 2":
+        angle = -(speed / 100) * t
         x = cx + max_rx * math.sin(angle)
         y = cy + max_ry * math.sin(angle) * math.cos(angle)
     else:
