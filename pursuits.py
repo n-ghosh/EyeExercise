@@ -44,7 +44,7 @@ pygame.display.set_caption("Eye Pursuit")
 clock = pygame.time.Clock()
 
 # --- Control State ---
-circle_radius = 40
+circle_radius = 10
 circle_speed = 150
 pattern_idx = 0
 sidebar_open = True
