@@ -13,7 +13,7 @@ Important constants are defined in constants.py for easy adjustments.
 
 import pygame
 import math
-import constants
+import constants as C
 
 # --- Movement Patterns ---
 PATTERNS = [
@@ -27,7 +27,7 @@ PATTERNS = [
     "Figure-Eight 2",
 ]
 pygame.init()
-screen = pygame.display.set_mode((constants.WIDTH, constants.HEIGHT))
+screen = pygame.display.set_mode((C.WIDTH, C.HEIGHT))
 pygame.display.set_caption("Eye Pursuit")
 clock = pygame.time.Clock()
 
@@ -39,72 +39,72 @@ sidebar_open = True
 
 # --- Slider/Dropdown UI ---
 def draw_slider(x, y, w, h, min_val, max_val, value, label):
-    pygame.draw.rect(screen, constants.GRAY, (x, y, w, h), border_radius=6)
+    pygame.draw.rect(screen, C.GRAY, (x, y, w, h), border_radius=6)
     # Slider bar
-    bar_width = w - 2 * constants.SLIDER_BAR_OFFSET
-    pos = int((value - min_val) / (max_val - min_val) * bar_width) + x + constants.SLIDER_BAR_OFFSET
-    pygame.draw.rect(screen, constants.BLUE, (x+constants.SLIDER_BAR_OFFSET, y+h//2-constants.SLIDER_BAR_HEIGHT//2, bar_width, constants.SLIDER_BAR_HEIGHT), border_radius=constants.SLIDER_BAR_HEIGHT//2)
+    bar_width = w - 2 * C.SL_BAR_OFFSET
+    pos = int((value - min_val) / (max_val - min_val) * bar_width) + x + C.SL_BAR_OFFSET
+    pygame.draw.rect(screen, C.BLUE, (x+C.SL_BAR_OFFSET, y+h//2-C.SL_BAR_HEIGHT//2, bar_width, C.SL_BAR_HEIGHT), border_radius=C.SL_BAR_HEIGHT//2)
     # Slider knob
-    pygame.draw.circle(screen, constants.RED, (pos, y+h//2), h//2-constants.SLIDER_KNOB_RADIUS_OFFSET)
+    pygame.draw.circle(screen, C.RED, (pos, y+h//2), h//2-C.SL_KNOB_RADIUS_OFFSET)
     # Label
     font = pygame.font.SysFont(None, 24)
-    text = font.render(f"{label}: {value:.0f}", True, constants.BLACK)
-    screen.blit(text, (x, y-constants.SLIDER_LABEL_OFFSET_Y))
+    text = font.render(f"{label}: {value:.0f}", True, C.BLACK)
+    screen.blit(text, (x, y-C.SL_LABEL_OFFSET_Y))
     return pos
 
 def draw_dropdown(x, y, w, h, options, selected_idx, open_):
     font = pygame.font.SysFont(None, 24)
-    pygame.draw.rect(screen, constants.GRAY, (x, y, w, h), border_radius=6)
-    text = font.render(options[selected_idx], True, constants.BLACK)
-    screen.blit(text, (x+constants.SLIDER_BAR_OFFSET, y+5))
-    pygame.draw.polygon(screen, constants.BLACK, [(x+w-20, y+h//2-5), (x+w-10, y+h//2-5), (x+w-15, y+h//2+5)])
+    pygame.draw.rect(screen, C.GRAY, (x, y, w, h), border_radius=6)
+    text = font.render(options[selected_idx], True, C.BLACK)
+    screen.blit(text, (x+C.SL_BAR_OFFSET, y+5))
+    pygame.draw.polygon(screen, C.BLACK, [(x+w-20, y+h//2-5), (x+w-10, y+h//2-5), (x+w-15, y+h//2+5)])
     if open_:
         for i, opt in enumerate(options):
             rect = pygame.Rect(x, y+(i+1)*h, w, h)
-            pygame.draw.rect(screen, constants.LIGHT_GRAY if i==selected_idx else constants.GRAY, rect, border_radius=6)
-            t = font.render(opt, True, constants.BLACK)
-            screen.blit(t, (x+constants.SLIDER_BAR_OFFSET, y+(i+1)*h+5))
+            pygame.draw.rect(screen, C.LIGHT_GRAY if i==selected_idx else C.GRAY, rect, border_radius=6)
+            t = font.render(opt, True, C.BLACK)
+            screen.blit(t, (x+C.SL_BAR_OFFSET, y+(i+1)*h+5))
     return
 
 def draw_toggle_button(x, y, w, h, is_open):
-    pygame.draw.rect(screen, constants.DARK_GRAY, (x, y, w, h), border_radius=8)
+    pygame.draw.rect(screen, C.DARK_GRAY, (x, y, w, h), border_radius=8)
     font_icon = pygame.font.SysFont(None, 28)
     font_label = pygame.font.SysFont(None, 22, bold=True)
     # Icon
-    icon = font_icon.render("\u25C0" if is_open else "\u25B6", True, constants.WHITE)
-    icon_rect = icon.get_rect(left=x+constants.TOGGLE_BTN_ICON_LEFT, centery=y+h//2)
+    icon = font_icon.render("\u25C0" if is_open else "\u25B6", True, C.WHITE)
+    icon_rect = icon.get_rect(left=x+C.TG_ICON_LEFT, centery=y+h//2)
     screen.blit(icon, icon_rect)
     # Label
-    label = font_label.render("Settings", True, constants.WHITE)
-    label_rect = label.get_rect(left=icon_rect.right+constants.TOGGLE_BTN_LABEL_LEFT, centery=y+h//2)
+    label = font_label.render("Settings", True, C.WHITE)
+    label_rect = label.get_rect(left=icon_rect.right+C.TG_LABEL_LEFT, centery=y+h//2)
     screen.blit(label, label_rect)
 
 def draw_sidebar():
     # Sidebar background
-    pygame.draw.rect(screen, constants.SIDEBAR_BG, (0, 0, constants.SIDEBAR_WIDTH, constants.HEIGHT))
-    pygame.draw.line(screen, constants.GRAY, (constants.SIDEBAR_WIDTH, 0), (constants.SIDEBAR_WIDTH, constants.HEIGHT), 2)
+    pygame.draw.rect(screen, C.SIDEBAR_BG, (0, 0, C.SIDEBAR_WIDTH, C.HEIGHT))
+    pygame.draw.line(screen, C.GRAY, (C.SIDEBAR_WIDTH, 0), (C.SIDEBAR_WIDTH, C.HEIGHT), 2)
     # Size slider
-    draw_slider(constants.SLIDER_X, 120, constants.SLIDER_WIDTH, constants.SLIDER_HEIGHT, constants.SIZE_MIN, constants.SIZE_MAX, circle_radius, "Size")
+    draw_slider(C.SL_X, 120, C.SL_W, C.SL_H, C.SIZE_MIN, C.SIZE_MAX, circle_radius, "Size")
     # Speed slider
-    draw_slider(constants.SLIDER_X, 220, constants.SLIDER_WIDTH, constants.SLIDER_HEIGHT, constants.SPEED_MIN, constants.SPEED_MAX, circle_speed, "Speed")
+    draw_slider(C.SL_X, 220, C.SL_W, C.SL_H, C.SPEED_MIN, C.SPEED_MAX, circle_speed, "Speed")
     # Pattern dropdown
     font = pygame.font.SysFont(None, 22)
-    screen.blit(font.render("Pattern", True, constants.BLACK), (constants.PATTERN_LABEL_X, constants.PATTERN_LABEL_Y))
-    draw_dropdown(constants.PATTERN_DROPDOWN_X, constants.PATTERN_DROPDOWN_Y, constants.PATTERN_DROPDOWN_WIDTH, constants.PATTERN_DROPDOWN_HEIGHT, PATTERNS, pattern_idx, dropdown_open)
+    screen.blit(font.render("Pattern", True, C.BLACK), (C.PT_LABEL_X, C.PT_LABEL_Y))
+    draw_dropdown(C.PT_DROPDOWN_X, C.PT_DROPDOWN_Y, C.PT_DROPDOWN_W, C.PT_DROPDOWN_H, PATTERNS, pattern_idx, dropdown_open)
 
 # --- Movement Functions ---
 def get_position(t, pattern, speed, radius):
     # Calculate center based on whether sidebar is open
-    offset = constants.SIDEBAR_WIDTH if sidebar_open else 0
-    available_width = constants.WIDTH - offset
+    offset = C.SIDEBAR_WIDTH if sidebar_open else 0
+    available_width = C.WIDTH - offset
     cx = offset + available_width // 2
-    cy = constants.HEIGHT // 2
+    cy = C.HEIGHT // 2
 
     # Calculate max movement radii so the circle stays inside the screen
-    max_rx = available_width // 2 - circle_radius - constants.MOVEMENT_PADDING
-    max_ry = cy - circle_radius - constants.MOVEMENT_PADDING
+    max_rx = available_width // 2 - circle_radius - C.MOVEMENT_PADDING
+    max_ry = cy - circle_radius - C.MOVEMENT_PADDING
 
-    angle = (speed / constants.ANGLE_DIVISOR) * t
+    angle = (speed / C.ANGLE_DIVISOR) * t
     if pattern == "Circle":
         x = cx + max_ry * math.cos(angle)  # Using max_ry to keep circle within vertical bounds
         y = cy + max_ry * math.sin(angle)
@@ -143,7 +143,7 @@ running = True
 start_ticks = pygame.time.get_ticks()
 
 while running:
-    dt = clock.tick(constants.FPS) / 10000
+    dt = clock.tick(C.FPS) / 10000
     t = (pygame.time.get_ticks() - start_ticks) / 1000
 
     for event in pygame.event.get():
@@ -153,28 +153,28 @@ while running:
             mx, my = event.pos
             # Toggle button (in top-left corner)
             if sidebar_open:
-                if constants.TOGGLE_BTN_X <= mx <= constants.TOGGLE_BTN_X + constants.TOGGLE_BTN_WIDTH and constants.TOGGLE_BTN_Y <= my <= constants.TOGGLE_BTN_Y + constants.TOGGLE_BTN_HEIGHT:
+                if C.TG_X <= mx <= C.TG_X + C.TG_W and C.TG_Y <= my <= C.TG_Y + C.TG_H:
                     sidebar_open = False
                     dropdown_open = False
                     continue
             else:
-                if constants.TOGGLE_BTN_X <= mx <= constants.TOGGLE_BTN_X + constants.TOGGLE_BTN_WIDTH and constants.TOGGLE_BTN_Y <= my <= constants.TOGGLE_BTN_Y + constants.TOGGLE_BTN_HEIGHT:
+                if C.TG_X <= mx <= C.TG_X + C.TG_W and C.TG_Y <= my <= C.TG_Y + C.TG_H:
                     sidebar_open = True
                     dropdown_open = False
                     continue
             # Only handle sidebar controls if sidebar is open
             if sidebar_open:
                 # Size slider
-                if constants.SLIDER_X <= mx <= constants.SLIDER_X + constants.SLIDER_WIDTH and 120 <= my <= 120 + constants.SLIDER_HEIGHT:
+                if C.SL_X <= mx <= C.SL_X + C.SL_W and 120 <= my <= 120 + C.SL_H:
                     slider_drag = 'size'
                 # Speed slider
-                elif constants.SLIDER_X <= mx <= constants.SLIDER_X + constants.SLIDER_WIDTH and 220 <= my <= 220 + constants.SLIDER_HEIGHT:
+                elif C.SL_X <= mx <= C.SL_X + C.SL_W and 220 <= my <= 220 + C.SL_H:
                     slider_drag = 'speed'
                 # Dropdown
-                elif constants.PATTERN_DROPDOWN_X <= mx <= constants.PATTERN_DROPDOWN_X + constants.PATTERN_DROPDOWN_WIDTH and constants.PATTERN_DROPDOWN_Y <= my <= constants.PATTERN_DROPDOWN_Y + constants.PATTERN_DROPDOWN_HEIGHT:
+                elif C.PT_DROPDOWN_X <= mx <= C.PT_DROPDOWN_X + C.PT_DROPDOWN_W and C.PT_DROPDOWN_Y <= my <= C.PT_DROPDOWN_Y + C.PT_DROPDOWN_H:
                     dropdown_open = not dropdown_open
-                elif dropdown_open and constants.PATTERN_DROPDOWN_X <= mx <= constants.PATTERN_DROPDOWN_X + constants.PATTERN_DROPDOWN_WIDTH and constants.PATTERN_DROPDOWN_Y + constants.PATTERN_DROPDOWN_HEIGHT < my <= constants.PATTERN_DROPDOWN_Y + constants.PATTERN_DROPDOWN_HEIGHT + len(PATTERNS) * constants.PATTERN_OPTION_HEIGHT:
-                    idx = (my - (constants.PATTERN_DROPDOWN_Y + constants.PATTERN_DROPDOWN_HEIGHT)) // constants.PATTERN_OPTION_HEIGHT
+                elif dropdown_open and C.PT_DROPDOWN_X <= mx <= C.PT_DROPDOWN_X + C.PT_DROPDOWN_W and C.PT_DROPDOWN_Y + C.PT_DROPDOWN_H < my <= C.PT_DROPDOWN_Y + C.PT_DROPDOWN_H + len(PATTERNS) * C.PT_OPTION_H:
+                    idx = (my - (C.PT_DROPDOWN_Y + C.PT_DROPDOWN_H)) // C.PT_OPTION_H
                     if 0 <= idx < len(PATTERNS):
                         pattern_idx = idx
                     dropdown_open = False
@@ -189,21 +189,21 @@ while running:
             mx, my = event.pos
             if slider_drag == 'size':
                 # Map mouse x to size
-                circle_radius = max(constants.SIZE_MIN, min(constants.SIZE_MAX, (mx - constants.SLIDER_X) * (constants.SIZE_MAX - constants.SIZE_MIN) / constants.SLIDER_WIDTH))
+                circle_radius = max(C.SIZE_MIN, min(C.SIZE_MAX, (mx - C.SL_X) * (C.SIZE_MAX - C.SIZE_MIN) / C.SL_W))
             elif slider_drag == 'speed':
-                circle_speed = max(constants.SPEED_MIN, min(constants.SPEED_MAX, (mx - constants.SLIDER_X) * (constants.SPEED_MAX - constants.SPEED_MIN) / constants.SLIDER_WIDTH))
+                circle_speed = max(C.SPEED_MIN, min(C.SPEED_MAX, (mx - C.SL_X) * (C.SPEED_MAX - C.SPEED_MIN) / C.SL_W))
 
     # Draw background
-    screen.fill(constants.WHITE)
+    screen.fill(C.WHITE)
 
     # Draw moving circle
     x, y = get_position(t, PATTERNS[pattern_idx], circle_speed, circle_radius)
-    pygame.draw.circle(screen, constants.BLUE, (x, y), int(circle_radius))
+    pygame.draw.circle(screen, C.BLUE, (x, y), int(circle_radius))
     # Draw sidebar if open
     if sidebar_open:
         draw_sidebar()
     # Draw toggle button in top-left corner, with 'Settings' inside
-    draw_toggle_button(constants.TOGGLE_BTN_X, constants.TOGGLE_BTN_Y, constants.TOGGLE_BTN_WIDTH, constants.TOGGLE_BTN_HEIGHT, sidebar_open)
+    draw_toggle_button(C.TG_X, C.TG_Y, C.TG_W, C.TG_H, sidebar_open)
 
     pygame.display.flip()
     dt = clock.tick(60) / 1000
