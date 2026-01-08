@@ -45,7 +45,7 @@ clock = pygame.time.Clock()
 
 # --- Control State ---
 circle_radius = 10
-circle_speed = 150
+circle_speed = 200
 pattern_idx = 0
 sidebar_open = True
 
@@ -115,37 +115,35 @@ def get_position(t, pattern, speed, radius):
     max_rx = available_width // 2 - circle_radius - 20
     max_ry = cy - circle_radius - 20
     
+    angle = (speed/100) * t
     if pattern == "Circle":
-        angle = (speed/100) * t
         x = cx + max_ry * math.cos(angle) # Using max_ry to keep circle within vertical bounds
         y = cy + max_ry * math.sin(angle)
     elif pattern == "Circle CCW":
-        angle = -(speed / 100) * t
-        x = cx + max_ry * math.cos(angle)
-        y = cy + max_ry * math.sin(angle)
+        x = cx + max_ry * math.cos(-angle)
+        y = cy + max_ry * math.sin(-angle)
     elif pattern == "Horizontal":
-        x = cx + (max_rx) * math.sin((speed/100)*t)
+        x = cx + (max_rx) * math.sin(angle)
         y = cy
     elif pattern == "Vertical":
         x = cx
-        y = cy + (max_ry) * math.sin((speed/100)*t)
+        y = cy + (max_ry) * math.sin(angle)
     elif pattern == "Diagonal":
         diag_r = min(max_rx, max_ry)
-        x = cx + diag_r * math.sin((speed/100)*t)
-        y = cy + diag_r * math.sin((speed/100)*t)
+        x = cx + diag_r * math.sin(angle)
+        y = cy + diag_r * math.sin(angle)
     elif pattern == "Diagonal 2":
         diag_r = min(max_rx, max_ry)
-        x = cx + diag_r * math.sin((speed / 100) * t)
-        y = cy - diag_r * math.sin((speed / 100) * t)
+        x = cx + diag_r * math.sin(angle)
+        y = cy - diag_r * math.sin(angle)
     elif pattern == "Figure-Eight":
-        angle = (speed/100) * t
         x = cx + max_rx * math.sin(angle)
         y = cy + max_ry * math.sin(angle) * math.cos(angle)
     elif pattern == "Figure-Eight 2":
-        angle = -(speed / 100) * t
-        x = cx + max_rx * math.sin(angle)
-        y = cy + max_ry * math.sin(angle) * math.cos(angle)
+        x = cx + max_rx * math.sin(-angle)
+        y = cy + max_ry * math.sin(-angle) * math.cos(-angle)
     else:
+        print("Unknown pattern:", pattern)
         x, y = cx, cy
     return int(x), int(y)
 
