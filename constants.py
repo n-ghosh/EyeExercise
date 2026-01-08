@@ -25,11 +25,10 @@ TG_LABEL_LEFT = 6
 # --- Pattern Label UI Constants ---
 PT_LABEL_X = 20
 PT_LABEL_Y = 300
-PT_DROPDOWN_X = 20
-PT_DROPDOWN_Y = 330
-PT_DROPDOWN_W = 240
-PT_DROPDOWN_H = 30
-PT_OPTION_H = 30
+PT_X = 20
+PT_Y = 330
+PT_W = 240
+PT_H = 30
 
 # --- Slider Value Ranges ---
 SIZE_MIN = 10
