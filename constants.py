@@ -31,7 +31,7 @@ PT_W = 240
 PT_H = 30
 
 # --- Slider Value Ranges ---
-SIZE_MIN = 10
+SIZE_MIN = 1
 SIZE_MAX = 100
 SPEED_MIN = 20
 SPEED_MAX = 400
